@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,9 +44,10 @@ public class UserController {
 	}
 	
 	//	update user
-	@PostMapping("/{id}")
+	@PutMapping("/{id}")
 	public User updateUser(@RequestBody User user, @PathVariable ("id") long userId) {
-		User existingUser = this.getuserById(userId);
+		User existingUser = this.userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found with id:" + userId)) ;
 		existingUser.setFirstName(user.getFirstName());
 		existingUser.setLastName(user.getLastName());
 		existingUser.setEmail(user.getEmail());
@@ -56,7 +58,8 @@ public class UserController {
 	//	delete user by id
 	@DeleteMapping("/{id}")
 	public ResponseEntity<User> deleteUser(@PathVariable ("id") long userId) {
-		User existingUser = this.getuserById(userId);
+		User existingUser = this.userRepository.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found with id:" + userId)) ;
 		this.userRepository.delete(existingUser);
 		return ResponseEntity.ok().build();
 	}
